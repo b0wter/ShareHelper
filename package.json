@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@types/deezer-sdk": "^0.0.2",
+    "@types/lodash": "^4.14.175",
+    "@types/node": "^16.10.3",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "axios": "^0.22.0",
+    "deezer-public-api": "^1.0.4",
+    "lodash": "^4.17.21",
+    "spotify-web-api-node": "^5.0.2"
+  }
+}
