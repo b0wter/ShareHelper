@@ -61,7 +61,9 @@ export class Deezer implements Provider
                 throw new Error ("Could not parse the contents of the retrieved page.");
             }
         }
-        var trackId = sharedUrl.replace('https://www.deezer.com/de/track/', '');
+        // Shared links may include a country identifier so we need to use a regex.
+        var trackId = sharedUrl.replace(/https:\/\/www\.deezer\.com\/.*\//, '');
+        // Shared links may come with additional url parameters.
         trackId = trackId.split('?')[0];
         return trackId;
     }
