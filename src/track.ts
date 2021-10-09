@@ -1,3 +1,5 @@
+import { Provider } from "./Provider";
+
 export class Track {
 
     constructor(
@@ -7,7 +9,7 @@ export class Track {
         public readonly album: string,
         public readonly artist: string,
         public readonly url: string,
-        public readonly source: string) {
+        public readonly source: Provider) {
         //
     }
 

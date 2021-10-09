@@ -6,6 +6,7 @@ import express from 'express';
 import { Html } from "./html";
 import { Track } from "./track";
 import _ from "lodash";
+import { YoutubeMusic } from "./youtube-music";
 
 const swig = require('swig');
 const cons = require("consolidate");
@@ -21,18 +22,18 @@ async function retrieveForProvider(provider: Provider, track: Track)
 async function retrieveTrackFromShareUrl(sharedUrl: string, providers: ProviderCollection) : Promise<Track[]>
 {
     const url = sharedUrl.toLocaleLowerCase();
-    const provider = providers.all.find(provider => url.includes(provider.identifier));
+    const provider = providers.all.find(provider => url.includes(provider.urlIdentifier));
     if(provider === null || provider === undefined)
         throw new Error("The given url does not match any of the known streaming providers.");
-    console.log(`Using provider '${provider.identifier}'.`);
+    console.log(`Using provider '${provider.urlIdentifier}'.`);
 
-    const others = providers.all.filter(p => p.identifier !== provider.identifier)
+    const others = providers.all.filter(p => p.urlIdentifier !== provider.urlIdentifier)
     if(others === null || others === undefined || others.length === 0)
         throw new Error("There is only a single provider implemented. Cannot do any meaningful translation.");
-    console.log('Other providers: ', others.map(p => p.identifier));
+    console.log('Other providers: ', others.map(p => p.urlIdentifier));
 
     const trackId = await provider.getTrackIdFromSharedUrl(sharedUrl);
-    console.log(`Track id for ${provider.identifier} is ${trackId}.`);
+    console.log(`Track id for ${provider.urlIdentifier} is ${trackId}.`);
     const track = await provider.getTrack(trackId);
     const promises = others.map(o => retrieveForProvider(o, track));
     const results = await Promise.all(promises);
@@ -43,7 +44,8 @@ async function retrieveTrackFromShareUrl(sharedUrl: string, providers: ProviderC
 async function main() {
     const spotify = await Spotify.createFromCredentials();
     const deezer = new Deezer();
-    const providers = new ProviderCollection(spotify, deezer);
+    const ytmusic = await YoutubeMusic.createAndInit();
+    const providers = new ProviderCollection(spotify, deezer, ytmusic);
     app.use(express.static('public'));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.get('/', (req, res) => {
@@ -72,4 +74,16 @@ async function main() {
     });
 }
 
+async function yttest()
+{
+    const yt = await YoutubeMusic.createAndInit();
+    const result = await yt.findTrack("citizen erased muse");
+    console.log(result);
+
+    const song = await yt.getTrack('jtXBocMpnaM');
+    console.log(song);
+    
+}
+
+//yttest();
 main();

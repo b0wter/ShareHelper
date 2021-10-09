@@ -8,11 +8,13 @@ const _ = require("lodash");
 export class Deezer implements Provider
 {
     private api : any = new DeezerPublicApi();
-    public identifier = "deezer";
+    public urlIdentifier = "deezer";
+    public name = 'Deezer';
+    public logo = 'deezer';
 
-    private trackFromResult(result: any)
+    private trackFromResult(result: any) : Track
     {
-        return new Track(result.id, result.title, result.duration, result.album.title, result.artist.name, result.link, "deezer");
+        return new Track(result.id, result.title, result.duration, result.album.title, result.artist.name, result.link, this);
     }
 
     public async findTrack(searchTerm: string, duration?: number)

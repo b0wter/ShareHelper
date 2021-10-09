@@ -28,11 +28,11 @@
                 <div class="card mb-3" style="max-width: 540px;">
                     <div class="row g-0">
                         <div class="col-4 d-flex align-items-center align-content-center">
-                            <img src="{{ track.source }}.png"" class="img-fluid rounded-start" alt="{{ track.source }}" style="padding: 2em;">
+                            <img src="{{ track.source.logo }}.png"" class="img-fluid rounded-start" alt="{{ track.source.name }}" style="padding: 2em;">
                         </div>
                         <div class="col-8">
                             <div class="card-body">
-                                <h5 class="card-title">{{ track.source|capitalize }}</h5>
+                                <h5 class="card-title">{{ track.source.name }}</h5>
                                 <p class="card-text"><b>Title: </b>{{ track.name }}</p>
                                 <p class="card-text"><b>Artist: </b>{{ track.artist }}</p>
                                 <p class="card-text"><small class="text-muted"><b>Album: </b>{{ track.album }}</small></p>
@@ -46,31 +46,6 @@
                     </div>
                 </div>
             </div>
-            <!--
-            <div class="col" style="display: flex; align-items: center; align-content: flex-start;">
-                <div>
-                    <img src="{{ track.source }}.png" class="card-img-left" alt="{{ track.source }}">
-                </div>
-                <div>
-                    <h5 >{{ track.source }}</h5>
-                    <p >{{ track.name }}</p>
-                    <p >{{ track.artist }}</p>
-                    <a href="{{ track.url }}" class="btn btn-primary">Open</a>
-                </div>
-            </div>
-            -->
-            <!--
-            <div class="card" style="width: 18rem;">
-                <img src="{{ track.source }}.png" class="card-img-top" alt="{{ track.source }}"
-                    style="width: 8em;display: block;margin-left: auto;margin-right: auto;margin-top: 1em;">
-                <div class="card-body">
-                    <h5 class="card-title">{{ track.source }}</h5>
-                    <p class="card-text">{{ track.name }}</p>
-                    <p class="card-text">{{ track.artist }}</p>
-                    <a href="{{ track.url }}" class="btn btn-primary">Open</a>
-                </div>
-            </div>
-            -->
         </div>
         {% endfor %}
     </div>

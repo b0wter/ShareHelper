@@ -11,7 +11,9 @@ export class Spotify implements Provider
         //
     }
 
-    public identifier = "spotify";
+    public urlIdentifier = 'spotify';
+    public name = 'Spotify';
+    public logo = 'spotify';
 
     public static async createFromCredentials() {
         const spotifyApi = new SpotifyWebApi({
@@ -33,7 +35,7 @@ export class Spotify implements Provider
     private trackFromItem(item: any) : Track
     {
         const artistName = item.artists.reduce((aggregator: string, next: any) => aggregator + " " + next.name, "").trimLeft();
-        return new Track(item.id, item.name, item.duration_ms / 1000, item.album.name, artistName, item.external_urls.spotify, this.identifier);
+        return new Track(item.id, item.name, item.duration_ms / 1000, item.album.name, artistName, item.external_urls.spotify, this);
     }
 
     public async getTrack(trackId: string) : Promise<Track>

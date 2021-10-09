@@ -14,6 +14,7 @@
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "spotify-web-api-node": "^5.0.2",
-    "swig": "^0.14.0"
+    "swig": "^0.14.0",
+    "youtube-music-api": "^1.0.6"
   }
 }
