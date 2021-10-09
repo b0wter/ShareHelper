@@ -16,5 +16,8 @@
     "spotify-web-api-node": "^5.0.2",
     "swig": "^0.14.0",
     "youtube-music-api": "^1.0.6"
+  },
+  "scripts": {
+    "build": "./build.sh"
   }
 }
