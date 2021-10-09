@@ -57,9 +57,6 @@ async function main() {
     app.post('/', async function (req, res) {
         if(req.body.sharedUrl) {
             const others = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers)
-            const links = _.reduce(others, function (agg: string, next: Track) {
-                return agg + " " + next.url;
-            }, "");
             const path = __dirname + "/views/output.html";
             const template = swig.compileFile(path);
             const output = template.render({tracks: others});
