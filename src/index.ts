@@ -12,7 +12,7 @@ const swig = require('swig');
 const cons = require("consolidate");
 const bodyParser = require('body-parser');
 const app = express();
-const port = 8099;
+const port = process.env.SHARE_HELPER_PORT ?? 8099;
 
 async function retrieveForProvider(provider: Provider, track: Track)
 {
