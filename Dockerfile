@@ -1,9 +1,16 @@
+FROM node:latest AS build
+WORKDIR /app
+COPY ["package.json", "package-lock.json*", "./"]
+RUN npm install 
+COPY . .
+RUN npm run build
+
 FROM node:latest
 ENV NODE_ENV=production
 ENV SHARE_HELPER_PORT=8099
 WORKDIR /app
-COPY ["package.json", "package-lock.json*", "./"]
-RUN npm install --production
-COPY dist/ .
+COPY --from=build /app/dist .
+COPY --from=build /app/node_modules ./node_modules
 RUN ls -la
+RUN pwd
 CMD [ "node", "index.js" ]
