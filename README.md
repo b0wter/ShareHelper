@@ -22,11 +22,21 @@ Neither Deezer nor YouTube Music require any authentication for the basic queryi
 
 Running the web app
 -------------------
-The easiest way to run the web app yourself is to use Docker. Use the instructions above to create a credentials file and then simply run the `docker.sh` script from the projects root directory. If you are on Windows you have to perform the following steps on your own:
+The easiest way to run the web app yourself is to use Docker. Use the instructions above to create a credentials file and then simply run the `docker.sh` script from the projects root directory to build an image. Then run it like this:
+```
+docker run -p 8099:8099 b0wter/share-helper
+```
+Add any additional parameters as you see fit (`-d`, `-it`, ...). 
+
+You can also run the web app using a local installation of NodeJS. Create a credentials file (see _requirements_ above) and then run the `build.sh` script. If you're on Windows you have to perform these steps manually:
+ - open a terminal and change into the project's root folder
  - run `npm i` to install the required packages.
  - run `./node_modules/.bin/tsc` to transpile typescript to javascript
  - copy the `public` folder into the `dist` folder
  - copy the `views` folder into the `dist` folder 
-The default port is 8099. You can change it in the `Dockerfile`.
 
-You can also run the web app using a local installation of NodeJS. Simply perform the steps above, change into the `dist` folder and run `node index.js`. You can change the default port 8099 to anything you like by setting the `SHARE_HELPER_PORT` environment variable.
+To start the app change into the `dist` folder and run `node index.js`.
+
+Port
+----
+To change the port the app is running use the `SHARE_HELPER_PORT` environment variable. It defaults to `8099`. If you're using docker you can change the variable in the `Dockerfile`.
