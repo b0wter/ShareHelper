@@ -28,10 +28,10 @@ async function retrieveTrackFromShareUrl(sharedUrl: string, providers: ProviderC
         throw new Error("There is only a single provider implemented. Cannot do any meaningful translation.");
 
     const trackId = await provider.getTrackIdFromSharedUrl(sharedUrl);
-    console.log(`Track id for ${provider.urlIdentifier} is ${trackId}.`);
     const track = await provider.getTrack(trackId);
     const promises = others.map(o => retrieveForProvider(o, track));
     const results = await Promise.all(promises);
+    results.push(track);
 
     return results;
 }
