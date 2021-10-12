@@ -11,6 +11,5 @@ ENV SHARE_HELPER_PORT=8099
 WORKDIR /app
 COPY --from=build /app/dist .
 COPY --from=build /app/node_modules ./node_modules
-RUN ls -la
 RUN pwd
 CMD [ "node", "index.js" ]
