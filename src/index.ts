@@ -80,4 +80,10 @@ async function main() {
     });
 }
 
+// Running node locally does not require this but it is necessary to shut down properly in a container.
+process.on('SIGINT', () => {
+  console.info("Received exit signal")
+  process.exit(0)
+})
+
 main();
