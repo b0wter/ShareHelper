@@ -14,10 +14,15 @@ export class Spotify implements Provider
     public name = 'Spotify';
     public logo = 'spotify';
 
-    public static async createFromCredentials() {
+    public static async createFromCredentials(clientId: string, clientSecret: string) {
+        if(!clientId || !clientSecret)
+        {
+            throw new Error("Spotify client id and/or client secret are empty!");
+        }
+        
         const spotifyApi = new SpotifyWebApi({
-            clientId: Credentials.spotify_client_id,
-            clientSecret: Credentials.spotify_client_secret
+            clientId: clientId,
+            clientSecret: clientSecret
         })
 
         await spotifyApi.clientCredentialsGrant().then(

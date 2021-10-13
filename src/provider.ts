@@ -14,17 +14,25 @@ export abstract class Provider
 }
 
 export class ProviderCollection {
+    private providers: Provider[] = [];
 
     public get all()
     {
-        return [ this.spotify, this.deezer, this.ytmusic ];
+        return this.providers;
     }
 
-    public constructor(
-        public readonly spotify: Spotify,
-        public readonly deezer: Deezer,
-        public readonly ytmusic: YoutubeMusic)
+    public constructor(deezer: Deezer, ytmusic: YoutubeMusic, spotify?: Spotify)
     {
-        //
+        this.providers.push(deezer);
+        this.providers.push(ytmusic);
+        if(spotify)
+        {
+            console.log("Spotify credentials have been set.")
+            this.providers.push(spotify);
+        }
+        else
+        {
+            console.log("Spotify credentials have not been set. Service is disabled.");
+        }
     }
 }

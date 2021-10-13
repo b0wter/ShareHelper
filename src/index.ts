@@ -49,10 +49,14 @@ async function retrieveAndRenderOutputTemplate(providers: ProviderCollection, sh
 }
 
 async function main() {
-    const spotify = await Spotify.createFromCredentials();
+    var spotify: Spotify | undefined = undefined;
+    if(spotifyClientId && spotifyClientSecret)
+    {
+        spotify = await Spotify.createFromCredentials(spotifyClientId, spotifyClientSecret);
+    }
     const deezer = new Deezer();
     const ytmusic = await YoutubeMusic.createAndInit();
-    const providers = new ProviderCollection(spotify, deezer, ytmusic);
+    const providers = new ProviderCollection(deezer, ytmusic, spotify);
     app.use(express.static('public'));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.get('/', async (req, res) => {
