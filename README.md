@@ -1,12 +1,18 @@
+Disclaimer
+==========
+I've written this to get some basic understanding of how nodejs and typescript work. Please don't consider this application as safe to run without proper precaution.
+
 Share Helper
 ============
 The goal of this project is to make sharing songs from streaming providers easier. How often have you wanted to share a link with a friend only to realise that they do not use the same music streaming provider? This web app converts links from Spotify, Deezer or YouTube Music to the other services.
 
-You can find a running instance of the server [here](https://sharehelper.gutsman.de).
-
 I would like to support additional services but:
  - Apple Music hides access to their api behind the 99$/year developer account
  - Amazon Music does not offer any api at all.
+
+Demo
+====
+[Go here](https://sharehelper.gutsman.de).
 
 Getting started
 ===============
