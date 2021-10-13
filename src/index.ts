@@ -1,15 +1,19 @@
 import { Deezer } from "./deezer";
 import { Spotify } from "./spotify"
-import { Provider, ProviderCollection } from "./Provider";
+import { Provider, ProviderCollection } from "./provider";
 import express from 'express';
 import { Track } from "./track";
 import _ from "lodash";
 import { YoutubeMusic } from "./youtube-music";
 
+require('dotenv').config();
+
 const swig = require('swig');
 const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.SHARE_HELPER_PORT ?? 8099;
+const spotifyClientId = process.env.SHARE_HELPER_SPOTIFY_CLIENT_ID;
+const spotifyClientSecret = process.env.SHARE_HELPER_SPOTIFY_CLIENT_SECRET;
 
 async function retrieveForProvider(provider: Provider, track: Track)
 {

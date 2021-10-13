@@ -1,4 +1,4 @@
-import { Provider } from "./Provider";
+import { Provider } from "./provider";
 import { Track } from "./track";
 const axios = require('axios').default;
 

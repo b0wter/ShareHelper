@@ -1,6 +1,5 @@
 import _ from "lodash";
-import { Credentials } from "./credentials";
-import { Provider } from "./Provider";
+import { Provider } from "./provider";
 import { Track } from "./track";
 
 const SpotifyWebApi = require('spotify-web-api-node');

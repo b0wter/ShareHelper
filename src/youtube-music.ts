@@ -1,4 +1,4 @@
-import { Provider } from "./Provider";
+import { Provider } from "./provider";
 import { Track } from "./track";
 import _ from "lodash";
 
