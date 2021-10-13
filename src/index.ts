@@ -40,12 +40,11 @@ async function retrieveTrackFromShareUrl(sharedUrl: string, providers: ProviderC
     return results;
 }
 
-async function retrieveAndRenderOutputTemplate(providers: ProviderCollection, sharedUrl: string)
+function renderOutputTemplate(tracks: Track[])
 {
-    const others = await retrieveTrackFromShareUrl(sharedUrl, providers)
     const path = __dirname + "/views/output.html";
     const template = swig.compileFile(path);
-    return template.render({tracks: others});
+    return template.render({tracks: tracks});
 }
 
 async function main() {
@@ -63,7 +62,8 @@ async function main() {
         const sharedUrl = req.query.sharedUrl;
         if(sharedUrl && typeof(sharedUrl) === "string")
         {
-            const output = await retrieveAndRenderOutputTemplate(providers, sharedUrl);
+            const tracks = await retrieveTrackFromShareUrl(sharedUrl, providers)
+            const output = renderOutputTemplate(tracks);
             res.send(output);
         }
         else
@@ -76,10 +76,21 @@ async function main() {
     });
     app.post('/', async function (req, res) {
         if(req.body.sharedUrl) {
-            const output = await retrieveAndRenderOutputTemplate(providers, req.body.sharedUrl);
+            const tracks = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
+            const output = renderOutputTemplate(tracks);
             res.send(output);
         } else {
-            console.error('There was no value given for the parameter "sharedUrl".');
+            console.error('There was no value given for the parameter "sharedUrl".', req.body);
+            res.redirect('/');
+        }
+    });
+    app.post('/api', async function (req, res) {
+        if(req.body.sharedUrl) {
+            const tracks = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
+            const tracksWithoutProvider = tracks.map(track => track.forApi());
+            res.json(tracksWithoutProvider);
+        } else {
+            console.error('There was no value given for the parameter "sharedUrl".', req.body);
             res.redirect('/');
         }
     });
