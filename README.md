@@ -69,6 +69,7 @@ services:
       SHARE_HELPER_SPOTIFY_CLIENT_SECRET: insert your secret here
     restart: unless-stopped
 ```
+If you want to use the `urlfor` feature that will translate `POST` requests with a `x-www-form-urlencoded` `sharedUrl` to a `GET` request that opens the results page you also need to set the `SHARE_HELPER_DOMAIN` environment variable because the app cannot determine that on its own. The value is the url under which the app is reachable.
 
 You can also run the web app using a local installation of NodeJS. Create a credentials file (see _requirements_ above) and then run the `build.sh` script. If you're on Windows you have to perform these steps manually:
  - open a terminal and change into the project's root folder

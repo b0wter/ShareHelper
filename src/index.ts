@@ -14,6 +14,7 @@ const app = express();
 const port = process.env.SHARE_HELPER_PORT ?? 8099;
 const spotifyClientId = process.env.SHARE_HELPER_SPOTIFY_CLIENT_ID;
 const spotifyClientSecret = process.env.SHARE_HELPER_SPOTIFY_CLIENT_SECRET;
+const domainName = process.env.SHARE_HELPER_DOMAIN;
 
 async function retrieveForProvider(provider: Provider, track: Track)
 {
@@ -90,6 +91,21 @@ async function main() {
             const tracksWithoutProvider = tracks.map(track => track.forApi());
             res.json(tracksWithoutProvider);
         } else {
+            console.error('There was no value given for the parameter "sharedUrl".', req.body);
+            res.redirect('/');
+        }
+    });
+    // Mainly for use with the ios shortcut app. Takes a shared link and generates a link to the results.
+    app.post('/urlfor', function(req, res) {
+        if(!domainName) {
+            res.status(500).send('The app is not properly configured to answer this request. The admin needs to set the SHARE_HELPER_DOMAIN environment variable.');
+        }
+        else if(req.body.sharedUrl) {
+            var url = new URL(domainName);
+            url.searchParams.append('sharedUrl', req.body.sharedUrl);
+            res.send(url.href);
+        } 
+        else {
             console.error('There was no value given for the parameter "sharedUrl".', req.body);
             res.redirect('/');
         }
