@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  blog:
+  share-helper:
     container_name: share-helper
-    image: b0wter/share-helper:latest
+    build: .
     ports:
       - "8083:8083/tcp"
     environment:
