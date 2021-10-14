@@ -13,7 +13,7 @@ class TrackWithoutProvider {
     }
 }
 
-class TrackForApiResult extends TrackWithoutProvider{
+export class TrackForApiResult extends TrackWithoutProvider{
     public readonly source: string;
 
     constructor(
@@ -32,7 +32,6 @@ class TrackForApiResult extends TrackWithoutProvider{
 }
 
 export class Track extends TrackWithoutProvider {
-
     constructor(
         id: string,
         name: string,

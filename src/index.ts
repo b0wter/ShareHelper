@@ -1,6 +1,6 @@
 import { Deezer } from "./deezer";
 import { Spotify } from "./spotify"
-import { Provider, ProviderCollection } from "./provider";
+import { ApiResult, Provider, ProviderCollection, ProviderResults } from "./provider";
 import express from 'express';
 import { Track } from "./track";
 import _ from "lodash";
@@ -21,31 +21,59 @@ async function retrieveForProvider(provider: Provider, track: Track)
     return await provider.findTrack(`${track.name} ${track.artist}`, track.duration);
 }
 
-async function retrieveTrackFromShareUrl(sharedUrl: string, providers: ProviderCollection) : Promise<Track[]>
+async function retrieveTrackFromShareUrl(sharedUrl: string, providers: ProviderCollection) : Promise<ProviderResults>
 {
     const url = sharedUrl.toLocaleLowerCase();
     const provider = providers.all.find(provider => url.includes(provider.urlIdentifier));
     if(provider === null || provider === undefined)
-        throw new Error("The given url does not match any of the known streaming providers.");
+        throw new Error("The given url '" + sharedUrl + "' does not match any of the known streaming providers.");
 
     const others = providers.all.filter(p => p.urlIdentifier !== provider.urlIdentifier)
     if(others === null || others === undefined || others.length === 0)
         throw new Error("There is only a single provider implemented. Cannot do any meaningful translation.");
 
+    console.log('retrieving track id from shared link');
     const trackId = await provider.getTrackIdFromSharedUrl(sharedUrl);
-    const track = await provider.getTrack(trackId);
-    const promises = others.map(o => retrieveForProvider(o, track));
+    if(trackId.isFailure())
+    {
+        if(trackId.isFailure())
+        {
+            throw new Error(`Could not get track id from url ${sharedUrl}.`);
+        }
+    }
+
+    console.log('retrieving track from original streaming provider');
+    const track = await provider.getTrack(trackId.value);
+    if(track.isFailure())
+    {
+        throw new Error(`Could not get track from ${provider.name}.`);
+    }
+
+    console.log('retrieving from other providers');
+    const promises = others.map(o => { 
+        const r = retrieveForProvider(o, track.value);
+        console.log(o.name, 'finished retrieving track details');
+        return r;
+    }); 
     const results = await Promise.all(promises);
     results.push(track);
 
-    return results;
+    console.log('finished all api requests');
+
+    const tracks = results.filter(r => r.isSuccess()).map(r => r.getOrThrow() as Track)
+    const errors = results.filter(r => r.isFailure()).flatMap(r => {
+        const e = r.errorOrNull();
+        return e === null ? [] : [e]
+    });
+
+    return new ProviderResults(tracks, errors);
 }
 
-function renderOutputTemplate(tracks: Track[])
+function renderOutputTemplate(results: ProviderResults)
 {
     const path = __dirname + "/views/output.html";
     const template = swig.compileFile(path);
-    return template.render({tracks: tracks});
+    return template.render({tracks: results.successes, errors: results.failures});
 }
 
 async function main() {
@@ -53,6 +81,8 @@ async function main() {
     if(spotifyClientId && spotifyClientSecret)
     {
         spotify = await Spotify.createFromCredentials(spotifyClientId, spotifyClientSecret);
+        if(spotify === undefined)
+            throw new Error("Could not initialize the spotify api client.");
     }
     const deezer = new Deezer();
     const ytmusic = await YoutubeMusic.createAndInit();
@@ -64,6 +94,7 @@ async function main() {
         if(sharedUrl && typeof(sharedUrl) === "string")
         {
             const tracks = await retrieveTrackFromShareUrl(sharedUrl, providers)
+            console.log('rendering output');
             const output = renderOutputTemplate(tracks);
             res.send(output);
         }
@@ -78,6 +109,7 @@ async function main() {
     app.post('/', async function (req, res) {
         if(req.body.sharedUrl) {
             const tracks = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
+            console.log('rendering output');
             const output = renderOutputTemplate(tracks);
             res.send(output);
         } else {
@@ -85,10 +117,11 @@ async function main() {
             res.redirect('/');
         }
     });
+    // Use this endpoint if you need machine readable results.
     app.post('/api', async function (req, res) {
         if(req.body.sharedUrl) {
-            const tracks = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
-            const tracksWithoutProvider = tracks.map(track => track.forApi());
+            const results = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
+            const tracksWithoutProvider = results.forApi();
             res.json(tracksWithoutProvider);
         } else {
             console.error('There was no value given for the parameter "sharedUrl".', req.body);

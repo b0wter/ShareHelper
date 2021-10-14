@@ -1,5 +1,6 @@
 import _ from "lodash";
-import { Provider } from "./provider";
+import { Result } from "typescript-result";
+import { ApiError, ApiResult, Provider } from "./provider";
 import { Track } from "./track";
 
 const SpotifyWebApi = require('spotify-web-api-node');
@@ -42,38 +43,53 @@ export class Spotify implements Provider
         return new Track(item.id, item.name, item.duration_ms / 1000, item.album.name, artistName, item.external_urls.spotify, this);
     }
 
-    public async getTrack(trackId: string) : Promise<Track>
+    public async getTrack(trackId: string) : Promise<ApiResult<Track>>
     {
-        const result = await this.api.getTrack(trackId);
-        return this.trackFromItem(result.body);
+        try
+        {
+            const result = await this.api.getTrack(trackId);
+            return Result.ok(this.trackFromItem(result.body));
+        }
+        catch(exception: any)
+        {
+            return Result.error(exception.message);
+        }
     }
 
-    public async findTrack(searchString: string, duration?: number) : Promise<Track>
+    public async findTrack(searchString: string, duration?: number) : Promise<ApiResult<Track>>
     {
-        const result = await this.api.searchTracks(searchString);
-        if(result.body.tracks && result.body.tracks.total > 0) {
-            if(duration)
-            {
-                const selected = _.minBy(result.body.tracks.items, (i: any) => Math.abs((i.duration_ms / 1000)));
-                return this.trackFromItem(selected);
+        try
+        {
+            const result = await this.api.searchTracks(searchString);
+            if(result.body.tracks && result.body.tracks.total > 0) {
+                if(duration)
+                {
+                    const selected = _.minBy(result.body.tracks.items, (i: any) => Math.abs((i.duration_ms / 1000)));
+                    return Result.ok(this.trackFromItem(selected));
+                }
+                else
+                {
+                const item = result.body.tracks.items[0];
+                return Result.ok(this.trackFromItem(item));
+                }
             }
             else
             {
-            const item = result.body.tracks.items[0];
-            return this.trackFromItem(item);
+                return Result.error(new ApiError("API did not return expected content.", this));
             }
-
         }
-        else
-            throw new Error("API did not return expected content.");
+        catch(exception: any)
+        {
+            return Result.error(exception.message);
+        }
     }
 
-    public getTrackIdFromSharedUrl(url: string) : Promise<string>
+    public getTrackIdFromSharedUrl(url: string) : Promise<ApiResult<string>>
     {
         // Urls look like this:
         // > https://open.spotify.com/track/0nAnrVl7WVS2zQL36Fp357?si=43c250cc5d3949ad&nd=1
         url = url.replace('https://open.spotify.com/track/', '')
         url = url.split('?')[0]
-        return Promise.resolve(url);
+        return Promise.resolve(Result.ok(url));
     }
 }

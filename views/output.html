@@ -47,6 +47,24 @@
                 </div>
             </div>
             {% endfor %}
+
+            {% for error in errors %}
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-4 d-flex align-items-center align-content-center">
+                            <img src="{{ error.source.logo }}.png"" class="img-fluid rounded-start" alt="{{ error.source.name }}" style="padding: 2em;">
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ Error }}</h5>
+                                <p class="card-text"><b>Reason: </b>{{ error.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
