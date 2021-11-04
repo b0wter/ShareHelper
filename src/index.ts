@@ -1,7 +1,7 @@
 import { Deezer } from "./deezer";
 import { Spotify } from "./spotify"
 import { ApiResult, Provider, ProviderCollection, ProviderResults } from "./provider";
-import express from 'express';
+import express, { Response } from 'express';
 import { Track } from "./track";
 import _ from "lodash";
 import { YoutubeMusic } from "./youtube-music";
@@ -76,6 +76,11 @@ function renderOutputTemplate(results: ProviderResults)
     return template.render({tracks: results.successes, errors: results.failures});
 }
 
+function sendErrorResponse(res: Response, error: string)
+{
+    res.send("The following error occured: " + error);
+}
+
 async function main() {
     var spotify: Spotify | undefined = undefined;
     if(spotifyClientId && spotifyClientSecret)
@@ -93,10 +98,16 @@ async function main() {
         const sharedUrl = req.query.sharedUrl;
         if(sharedUrl && typeof(sharedUrl) === "string")
         {
-            const tracks = await retrieveTrackFromShareUrl(sharedUrl, providers)
-            console.log('rendering output');
-            const output = renderOutputTemplate(tracks);
-            res.send(output);
+            try {
+                const tracks = await retrieveTrackFromShareUrl(sharedUrl, providers)
+                console.log('rendering output');
+                const output = renderOutputTemplate(tracks);
+                res.send(output);
+            }
+            catch(error: any)
+            {
+                sendErrorResponse(res, error.message);
+            }
         }
         else
         {
@@ -108,10 +119,16 @@ async function main() {
     });
     app.post('/', async function (req, res) {
         if(req.body.sharedUrl) {
-            const tracks = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
-            console.log('rendering output');
-            const output = renderOutputTemplate(tracks);
-            res.send(output);
+            try {
+                const tracks = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
+                console.log('rendering output');
+                const output = renderOutputTemplate(tracks);
+                res.send(output);
+            }
+            catch(error: any)
+            {
+                sendErrorResponse(res, error.message);
+            }
         } else {
             console.error('There was no value given for the parameter "sharedUrl".', req.body);
             res.redirect('/');
@@ -120,9 +137,16 @@ async function main() {
     // Use this endpoint if you need machine readable results.
     app.post('/api', async function (req, res) {
         if(req.body.sharedUrl) {
-            const results = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
-            const tracksWithoutProvider = results.forApi();
-            res.json(tracksWithoutProvider);
+            try
+            {
+                const results = await retrieveTrackFromShareUrl(req.body.sharedUrl, providers);
+                const tracksWithoutProvider = results.forApi();
+                res.json(tracksWithoutProvider);
+            }
+            catch(error: any)
+            {
+                sendErrorResponse(res, error.message);
+            }
         } else {
             console.error('There was no value given for the parameter "sharedUrl".', req.body);
             res.redirect('/');
